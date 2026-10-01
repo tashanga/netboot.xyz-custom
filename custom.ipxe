@@ -1,0 +1,47 @@
+#!ipxe
+# Benutzerdefiniertes Menü: Debian Live direkt aus dem Internet streamen
+
+:custom_menu
+menu Debian Live-Systeme (Internet Streaming via GitHub)
+item --gap -- Waehle eine Desktop-Umgebung:
+item debian_gnome   Debian Live (GNOME Desktop - Modern)
+item debian_xfce    Debian Live (XFCE Desktop - Leichtgewichtig)
+item debian_cinnamon Debian Live (Cinnamon Desktop)
+item --gap -- Navigation:
+item return Zurueck zum Hauptmenue
+choose --default return --timeout 15000 target && goto ${target}
+
+:debian_gnome
+# Definiert das aktuelle Release-Tag aus dem GitHub-Repository
+set release_tag 2026.2-6fd5ce88
+set flavor gnome-13
+set base_url https://github.com{release_tag}
+echo Streaming Debian Live GNOME via HTTPS...
+# 'fetch=' sagt dem Kernel, woher er das SquashFS-Dateisystem zur Laufzeit laden soll
+kernel ${base_url}/vmlinuz boot=live fetch=${base_url}/${flavor}-filesystem.squashfs initrd=initrd ip=dhcp netboot=http
+initrd ${base_url}/initrd
+boot
+goto custom_menu
+
+:debian_xfce
+set release_tag 2026.2-6fd5ce88
+set flavor xfce-13
+set base_url https://github.com{release_tag}
+echo Streaming Debian Live XFCE via HTTPS...
+kernel ${base_url}/vmlinuz boot=live fetch=${base_url}/${flavor}-filesystem.squashfs initrd=initrd ip=dhcp netboot=http
+initrd ${base_url}/initrd
+boot
+goto custom_menu
+
+:debian_cinnamon
+set release_tag 2026.2-6fd5ce88
+set flavor cinnamon-13
+set base_url https://github.com{release_tag}
+echo Streaming Debian Live Cinnamon via HTTPS...
+kernel ${base_url}/vmlinuz boot=live fetch=${base_url}/${flavor}-filesystem.squashfs initrd=initrd ip=dhcp netboot=http
+initrd ${base_url}/initrd
+boot
+goto custom_menu
+
+:return
+chain --replace --errorcmd menu_failed ${menu_url}
